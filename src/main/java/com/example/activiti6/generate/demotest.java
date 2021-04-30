@@ -30,18 +30,21 @@ public class demotest {
 
     public static void main(String[] args) {
         logger.info("流程启动");
-        //创建流程引擎
+        // 创建流程引擎（单机、内存）
         ProcessEngine processEngine = ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration().buildProcessEngine();
         logger.info("流程器名称：{};流程器版本号：{}",processEngine.getName(),ProcessEngine.VERSION);
-        //部署流程定义文件
+
+        // 部署流程定义文件
         RepositoryService repositoryService = processEngine.getRepositoryService();
         Deployment deploy = repositoryService.createDeployment().addClasspathResource("processes/MyProcess.bpmn").deploy();
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deploy.getId()).singleResult();
         logger.info("流程定义文件名称：{};流程定义文件id：{}",processDefinition.getName(),processDefinition.getId());
-        //启动运行流程
+
+        // 启动运行流程
         ProcessInstance processInstance = processEngine.getRuntimeService().startProcessInstanceById(processDefinition.getId());
         logger.info("流程实例的定义key：{}",processInstance.getProcessDefinitionKey());
-        //处理流程任务
+
+        // 处理流程任务
         Scanner scanner = new Scanner(System.in);
         while(processInstance != null && !processInstance.isEnded()){
             TaskService taskService = processEngine.getTaskService();
@@ -62,7 +65,7 @@ public class demotest {
                     logger.info("您输入的内容是：{}",line);
                 }
                 taskService.complete(task.getId(),variables);
-                //查询当前流程实例
+                // 查询当前流程实例
                 processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
             }
             logger.info("待处理任务数量：{}",list.size());
